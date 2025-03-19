@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Items{% endblock %}
+
+{% block content %}
+<h1>Items</h1>
+<ul>
+  {% for item in items %}
+  <li>{{ item.id }} - {{ item.name }} (Owner: {{ item.owner_id }})</li>
+  {% endfor %}
+</ul>
+
+<h2>Add an Item</h2>
+<form action="/items/create" method="post">
+  <input type="text" name="name" placeholder="Item name" required>
+  <input type="number" name="owner_id" placeholder="Owner ID" required>
+  <button type="submit">Add Item</button>
+</form>
+{% endblock %}

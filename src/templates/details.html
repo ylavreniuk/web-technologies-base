@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Details{% endblock %}
+
+{% block content %}
+<h1>Item Details</h1>
+<ul>
+  {% for detail in details %}
+  <li>{{ detail.id }} - {{ detail.description }} (Item: {{ detail.item_id }})</li>
+  {% endfor %}
+</ul>
+
+<h2>Add Item Detail</h2>
+<form action="/details/create" method="post">
+  <input type="text" name="description" placeholder="Detail description" required>
+  <input type="number" name="item_id" placeholder="Item ID" required>
+  <button type="submit">Add Detail</button>
+</form>
+{% endblock %}

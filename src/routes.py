@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException, Request, Form, APIRouter
 from sqlalchemy.orm import Session
 
-from main import templates
-from .dependencies import get_db
-from .models import User, Item, Tag, Detail
+from src.config import templates
+from src.dependencies import get_db
+from src.models import User, Item, Tag, Detail
 
 router = APIRouter()
 
