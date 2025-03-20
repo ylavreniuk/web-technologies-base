@@ -1,8 +1,8 @@
-# Set installation paths on D:\ drive
-$BaseInstallPath = "D:\Tools"
+# Set installation paths on Windows
+$BaseInstallPath = "$env:LOCALAPPDATA\tools"
 $PythonPath = "$BaseInstallPath\Python"
 $SQLitePath = "$BaseInstallPath\SQLite"
-$PoetryPath = "$BaseInstallPath\Poetry"
+$UvPath = "$BaseInstallPath\Uv"
 
 # Function to check if a command exists
 function Command-Exists {
@@ -10,43 +10,50 @@ function Command-Exists {
     return [bool](Get-Command $command -ErrorAction SilentlyContinue)
 }
 
-# Uninstall Poetry
-if (Command-Exists poetry) {
-    Write-Host "Uninstalling Poetry..."
-    poetry self uninstall -y
+# Check if WinGet is installed
+if (!(Command-Exists winget)) {
+    Write-Host "WinGet is not installed. Please install it manually: https://aka.ms/getwinget"
+    exit 1
+}
+
+# Uninstall required tools using WinGet
+$packages = @(
+    @{ Name = "Git.Git"; Command = "git" },
+    @{ Name = "Python.Python.3.12"; Command = "python" },
+    @{ Name = "SQLite.SQLite"; Command = "sqlite3" },
+    @{ Name = "astral-sh.uv"; Command = "uv" }
+)
+
+foreach ($package in $packages) {
+    if (Command-Exists $package.Command) {
+        Write-Host "Uninstalling $($package.Command) using WinGet..."
+        winget uninstall --id=$($package.Name) -e --silent --accept-source-agreements --accept-package-agreements
+
+        if (!(Command-Exists $package.Command)) {
+            Write-Host "$($package.Command) uninstalled successfully."
+        } else {
+            Write-Host "$($package.Command) uninstallation failed. Please check manually."
+            exit 1
+        }
+    } else {
+        Write-Host "$($package.Command) is not installed. Skipping."
+    }
+}
+
+# Remove dependencies installed by uv
+Write-Host "Removing Python dependencies installed by uv..."
+if (Test-Path "$BaseInstallPath\venv") {
+    Remove-Item -Recurse -Force "$BaseInstallPath\venv"
+    Write-Host "Virtual environment removed."
+}
+
+# Remove tools directory
+Write-Host "Removing tools directory..."
+if (Test-Path $BaseInstallPath) {
+    Remove-Item -Recurse -Force $BaseInstallPath
+    Write-Host "Tools directory removed successfully."
 } else {
-    Write-Host "Poetry is not installed."
+    Write-Host "Tools directory does not exist."
 }
 
-# Uninstall Python
-if (Test-Path "$PythonPath\python.exe") {
-    Write-Host "Uninstalling Python from $PythonPath..."
-    Remove-Item -Recurse -Force $PythonPath
-    Write-Host "Python uninstalled successfully."
-} else {
-    Write-Host "Python is not installed in $PythonPath."
-}
-
-# Uninstall SQLite
-if (Test-Path $SQLitePath) {
-    Write-Host "Uninstalling SQLite from $SQLitePath..."
-    Remove-Item -Recurse -Force $SQLitePath
-    Write-Host "SQLite uninstalled successfully."
-} else {
-    Write-Host "SQLite is not installed in $SQLitePath."
-}
-
-# Remove Poetry path (if exists)
-if (Test-Path $PoetryPath) {
-    Write-Host "Removing Poetry directory..."
-    Remove-Item -Recurse -Force $PoetryPath
-}
-
-# Remove paths from the system PATH variable
-$envPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-$NewPath = $envPath -replace [regex]::Escape("$PythonPath;"), "" -replace [regex]::Escape("$SQLitePath;"), "" -replace [regex]::Escape("$PoetryPath;"), ""
-
-[System.Environment]::SetEnvironmentVariable("Path", $NewPath, [System.EnvironmentVariableTarget]::Machine)
-
-Write-Host "Cleanup complete. Restart your system to apply changes."
-
+Write-Host "Uninstallation complete. Restart your terminal to apply changes."

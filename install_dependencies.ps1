@@ -30,19 +30,9 @@ $packages = @(
 )
 
 foreach ($package in $packages) {
-    if (!(Command-Exists $package.Command)) {
-        Write-Host "$($package.Command) not found. Installing using WinGet..."
-        winget install --id=$($package.Name) -e --silent --accept-source-agreements --accept-package-agreements
-
-        if (Command-Exists $package.Command) {
-            Write-Host "$($package.Command) installed successfully."
-        } else {
-            Write-Host "$($package.Command) installation failed. Please check manually."
-            exit 1
-        }
-    } else {
-        Write-Host "$($package.Command) is already installed."
-    }
+    Write-Host "Installing $($package.Command) using WinGet..."
+    winget install --id=$($package.Name) -e --silent --accept-source-agreements --accept-package-agreements
+    Write-Host "$($package.Command) installation complete. If you cannot access the command, restart your terminal or open a new one."
 }
 
 # Install dependencies using uv
@@ -55,4 +45,4 @@ if (Test-Path "pyproject.toml") {
     Write-Host "Error: No pyproject.toml found in the current directory. Skipping dependency installation."
 }
 
-Write-Host "Installation complete. Restart your terminal to apply changes."
+Write-Host "Installation complete. If you cannot access the installed commands, restart your terminal or open a new one."
