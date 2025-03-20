@@ -4,6 +4,7 @@ __pycache__/
 .env
 venv/
 poetry.lock
+uv.lock
 test.db
 instance/
 .DS_Store
