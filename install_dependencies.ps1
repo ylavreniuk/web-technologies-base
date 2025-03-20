@@ -1,4 +1,4 @@
-# Set installation paths on D:\ drive
+# Set installation paths on Windows
 $BaseInstallPath = "D:\Tools"
 $PythonPath = "$BaseInstallPath\Python"
 $SQLitePath = "$BaseInstallPath\SQLite"
@@ -12,64 +12,94 @@ function Command-Exists {
 
 # Ensure the base install directory exists
 if (!(Test-Path $BaseInstallPath)) {
-    New-Item -ItemType Directory -Path $BaseInstallPath | Out-Null
+    New-Item -ItemType Directory -Path $BaseInstallPath -Force | Out-Null
 }
 
-# Install Python
+# Install Git if not installed
+if (!(Command-Exists git)) {
+    Write-Host "Git not found. Downloading and installing Git..."
+    
+    $GitInstallerUrl = "https://github.com/git-for-windows/git/releases/latest/download/Git-2.42.0-64-bit.exe"
+    $GitInstallerPath = "$env:TEMP\git-installer.exe"
+
+    Invoke-WebRequest -Uri $GitInstallerUrl -OutFile $GitInstallerPath
+
+    Write-Host "Running Git installer..."
+    Start-Process -FilePath $GitInstallerPath -ArgumentList "/VERYSILENT /NORESTART" -Wait
+
+    if (Command-Exists git) {
+        Write-Host "Git installed successfully."
+    } else {
+        Write-Host "Git installation failed. Please check manually: https://git-scm.com/download/win"
+        exit 1
+    }
+} else {
+    Write-Host "Git is already installed."
+}
+
+# Install Python if not installed
 if (!(Command-Exists python)) {
-    Write-Host "Python not found. Installing Python to $PythonPath..."
+    Write-Host "Python not found. Downloading and installing Python..."
     
     $PythonInstallerUrl = "https://www.python.org/ftp/python/3.12.1/python-3.12.1-amd64.exe"
     $PythonInstallerPath = "$env:TEMP\python-installer.exe"
-    
+
     Invoke-WebRequest -Uri $PythonInstallerUrl -OutFile $PythonInstallerPath
-    
+
     Write-Host "Running Python installer..."
-    Start-Process -FilePath $PythonInstallerPath -ArgumentList "/quiet InstallAllUsers=1 TargetDir=$PythonPath PrependPath=1" -Wait
-    
-    # Verify Python installation
-    if (Test-Path "$PythonPath\python.exe") {
-        Write-Host "Python installed successfully in $PythonPath."
+    Start-Process -FilePath $PythonInstallerPath -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
+
+    if (Command-Exists python) {
+        Write-Host "Python installed successfully."
     } else {
-        Write-Host "Python installation failed. Please check manually."
+        Write-Host "Python installation failed. Please check manually: https://www.python.org/downloads/"
         exit 1
     }
 } else {
     Write-Host "Python is already installed."
 }
 
-# Install SQLite
-if (!(Test-Path $SQLitePath)) {
-    New-Item -ItemType Directory -Path $SQLitePath | Out-Null
+# Install SQLite if not installed
+if (!(Command-Exists sqlite3)) {
+    Write-Host "Installing SQLite..."
+    
+    $SQLiteUrl = "https://www.sqlite.org/2024/sqlite-tools-win-x64-3440200.zip"
+    $SQLiteZipPath = "$env:TEMP\sqlite.zip"
+    $SQLiteExtractPath = "$SQLitePath"
+
+    Invoke-WebRequest -Uri $SQLiteUrl -OutFile $SQLiteZipPath
+    Expand-Archive -Path $SQLiteZipPath -DestinationPath $SQLiteExtractPath -Force
+
+    $SQLiteExe = "$SQLiteExtractPath\sqlite3.exe"
+    if (Test-Path $SQLiteExe) {
+        [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";" + $SQLiteExtractPath, [System.EnvironmentVariableTarget]::Machine)
+        Write-Host "SQLite installed successfully."
+    } else {
+        Write-Host "SQLite installation failed. Please check manually: https://www.sqlite.org/download.html"
+        exit 1
+    }
+} else {
+    Write-Host "SQLite is already installed."
 }
 
-$SQLiteUrl = "https://www.sqlite.org/2024/sqlite-tools-win32-x86-3440200.zip"
-$DownloadPath = "$env:TEMP\sqlite.zip"
-
-Write-Host "Downloading SQLite..."
-Invoke-WebRequest -Uri $SQLiteUrl -OutFile $DownloadPath
-
-Write-Host "Extracting SQLite to $SQLitePath..."
-Expand-Archive -Path $DownloadPath -DestinationPath $SQLitePath -Force
-
-$envPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-if ($envPath -notlike "*$SQLitePath*") {
-    Write-Host "Adding SQLite to system PATH..."
-    [System.Environment]::SetEnvironmentVariable("Path", "$envPath;$SQLitePath", [System.EnvironmentVariableTarget]::Machine)
-}
-
-Write-Host "SQLite installed successfully in $SQLitePath."
-
-# Install Poetry
+# Install Poetry if not installed
 if (!(Command-Exists poetry)) {
-    Write-Host "Installing Poetry to $PoetryPath..."
-    Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing | Invoke-Expression
+    Write-Host "Installing Poetry..."
+    
+    $PoetryInstallScriptUrl = "https://install.python-poetry.org"
+    $PoetryInstallScriptPath = "$env:TEMP\install-poetry.py"
 
-    # Verify Poetry installation
-    if (Command-Exists poetry) {
+    Invoke-WebRequest -Uri $PoetryInstallScriptUrl -OutFile $PoetryInstallScriptPath
+
+    Write-Host "Running Poetry installer..."
+    python $PoetryInstallScriptPath
+
+    $PoetryExe = "$env:USERPROFILE\.local\bin\poetry.exe"
+    if (Test-Path $PoetryExe) {
+        [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";" + "$env:USERPROFILE\.local\bin", [System.EnvironmentVariableTarget]::Machine)
         Write-Host "Poetry installed successfully."
     } else {
-        Write-Host "Poetry installation failed. Try running the script as Administrator."
+        Write-Host "Poetry installation failed. Please check manually: https://python-poetry.org/docs/#installation"
         exit 1
     }
 } else {
@@ -87,4 +117,3 @@ if (Test-Path "pyproject.toml") {
 }
 
 Write-Host "Installation complete. Restart your terminal to apply changes."
-
