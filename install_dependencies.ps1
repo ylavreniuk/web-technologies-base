@@ -17,7 +17,7 @@ if (!(Test-Path $BaseInstallPath)) {
 
 # Check if WinGet is installed
 if (!(Command-Exists winget)) {
-    Write-Host "WinGet is not installed. Please install it manually: https://aka.ms/getwinget"
+    Write-Host "WinGet is not installed. Please install it manually: https://github.com/microsoft/winget-cli?tab=readme-ov-file#microsoft-store-recommended"
     exit 1
 }
 
