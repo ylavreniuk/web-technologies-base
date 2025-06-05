@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, Request, Form, APIRouter
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from src.config import templates
@@ -7,13 +8,27 @@ from src.models import User, Item, Tag, Detail
 
 router = APIRouter()
 
+@router.get("/profile")
+def show_profile(request: Request):
+    user_data = {
+    "name": "User Userenko",
+    "email": "user@example.com",
+    "bio": "Розробник веб-застосунків",
+    "role": "Admin"
+    }
+    return templates.TemplateResponse("profile.html", {"request": request,
+    "user": user_data})
+
 
 @router.get("/")
 def home(request: Request, db: Session = Depends(get_db)):
-    users = db.query(User).all()
-    return templates.TemplateResponse(
-        "users.html", {"request": request, "users": users}
-    )
+    try:
+        users = db.query(User).all()
+        return templates.TemplateResponse(
+            "users.html", {"request": request, "users": users}
+        )
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 @router.post("/users/create")
