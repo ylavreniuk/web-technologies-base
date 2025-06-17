@@ -16,13 +16,9 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card shadow-sm">
-                    <img src="https://via.placeholder.com/150" class="card-img-top rounded-circle mx-auto mt-3"
-                        alt="Фото профілю" style="width: 150px; height: 150px;">
                     <div class="card-body text-center">
-                        <h3 class="card-title">{{ user.name }}</h3>
-                        <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
-                        <p class="card-text"><strong>Роль:</strong> {{ user.role }}</p>
-                        <p class="card-text"><strong>Біо:</strong> {{ user.bio }}</p>
+                        <h3 class="card-title" id="username"></h3>
+                        <button id="logout-btn" class="btn btn-danger mt-3">Вийти</button>
                     </div>
                 </div>
             </div>

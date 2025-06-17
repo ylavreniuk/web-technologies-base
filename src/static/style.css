@@ -14,6 +14,7 @@ body {
     font-weight: bold;
 }
 
+.card-text,
 .form-label {
     color: #343a40;
 }
@@ -34,5 +35,10 @@ h1 {
 @media (max-width: 576px) {
     h1 {
         font-size: 1.8rem;
+    }
+
+    .card-img-top {
+        width: 120px !important;
+        height: 120px !important;
     }
 }

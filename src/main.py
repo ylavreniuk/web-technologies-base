@@ -8,10 +8,10 @@ app = FastAPI()
 # Налаштування CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Дозволяє запити з будь-якого джерела
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Дозволяє всі методи (GET, POST тощо)
-    allow_headers=["*"],  # Дозволяє всі заголовки
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
