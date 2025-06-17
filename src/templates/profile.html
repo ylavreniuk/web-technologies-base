@@ -23,8 +23,6 @@
                         <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
                         <p class="card-text"><strong>Роль:</strong> {{ user.role }}</p>
                         <p class="card-text"><strong>Біо:</strong> {{ user.bio }}</p>
-                        <button id="hello-btn" class="btn btn-primary mt-3">Привітати</button>
-                        <div id="greeting" class="mt-3"></div>
                     </div>
                 </div>
             </div>
@@ -33,13 +31,22 @@
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h4 class="card-title">Валідація email</h4>
-                        <form id="email-form">
+                        <h4 class="card-title">Надіслати повідомлення</h4>
+                        <form id="submission-form">
+                            <div class="mb-3">
+                                <label for="name-input" class="form-label">Ім’я:</label>
+                                <input type="text" class="form-control" id="name-input" placeholder="Введіть ім’я">
+                            </div>
                             <div class="mb-3">
                                 <label for="email-input" class="form-label">Email:</label>
                                 <input type="email" class="form-control" id="email-input" placeholder="Введіть email">
                             </div>
-                            <button type="submit" class="btn btn-success">Надіслати</button>
+                            <div class="mb-3">
+                                <label for="message-input" class="form-label">Повідомлення:</label>
+                                <textarea class="form-control" id="message-input"
+                                    placeholder="Введіть повідомлення"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Надіслати</button>
                         </form>
                         <div id="form-message" class="mt-3"></div>
                     </div>

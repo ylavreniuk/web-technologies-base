@@ -1,45 +1,54 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Обробка кнопки привітання
-  const button = document.getElementById("hello-btn");
-  const greetingDiv = document.getElementById("greeting");
-  button.addEventListener("click", function () {
-    greetingDiv.textContent = "Привіт, користувачу!";
-    greetingDiv.classList.add("text-success");
-  });
-
-  // Обробка форми та валідація email
-  const form = document.getElementById("email-form");
+  const form = document.getElementById("submission-form");
+  const nameInput = document.getElementById("name-input");
   const emailInput = document.getElementById("email-input");
+  const messageInput = document.getElementById("message-input");
   const formMessage = document.getElementById("form-message");
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
-    const email = emailInput.value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // Очищення попередніх повідомлень
     formMessage.textContent = "";
     formMessage.classList.remove("text-success", "text-danger");
 
+    // Валідація полів
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const message = messageInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name) {
+      formMessage.textContent = "Ім’я не може бути порожнім!";
+      formMessage.classList.add("text-danger");
+      return;
+    }
     if (!emailRegex.test(email)) {
-      formMessage.textContent = "Будь ласка, введіть коректний email!";
+      formMessage.textContent = "Введіть коректний email!";
+      formMessage.classList.add("text-danger");
+      return;
+    }
+    if (!message) {
+      formMessage.textContent = "Повідомлення не може бути порожнім!";
       formMessage.classList.add("text-danger");
       return;
     }
 
+    // Відправлення даних на сервер
     try {
-      const response = await fetch("/api/message", {
+      const response = await fetch("/api/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: email }),
+        body: JSON.stringify({ name, email, message }),
       });
 
       const data = await response.json();
       if (response.ok) {
         formMessage.textContent = data.message;
         formMessage.classList.add("text-success");
-        emailInput.value = "";
+        form.reset();
       } else {
         formMessage.textContent = data.detail || "Помилка сервера!";
         formMessage.classList.add("text-danger");

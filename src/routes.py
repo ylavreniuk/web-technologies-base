@@ -1,15 +1,10 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, EmailStr
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, EmailStr
+from src.schemas import UserSubmission
+from src.services.form_handler import handle_submission
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/templates")
-
-class EmailRequest(BaseModel):
-    email: EmailStr
 
 @router.get("/profile")
 async def show_profile(request: Request):
@@ -21,6 +16,7 @@ async def show_profile(request: Request):
     }
     return templates.TemplateResponse("profile.html", {"request": request, "user": user_data})
 
-@router.post("/api/message")
-async def send_message(email_request: EmailRequest):
-    return {"message": f"Email {email_request.email} успішно отримано!"}
+@router.post("/api/submit")
+async def submit_form(data: UserSubmission):
+    response = handle_submission(data)
+    return {"status": "success", "data": data, "message": response["message"]}
