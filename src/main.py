@@ -1,15 +1,8 @@
 from fastapi import FastAPI
-from src.database import engine, Base
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from src.routes import router
-from src.config import static_files
-from src.models import init_db
-from src.database import SessionLocal
 
 app = FastAPI()
-app.mount("/static", static_files, name="static")
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 app.include_router(router)
-
-Base.metadata.create_all(bind=engine)
-
-with SessionLocal() as db:
-    init_db(db)
