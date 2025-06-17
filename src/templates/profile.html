@@ -7,6 +7,7 @@
     <title>Профіль користувача</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
+    <script src="{{ url_for('static', path='js/script.js') }}" defer></script>
 </head>
 
 <body>
@@ -22,6 +23,25 @@
                         <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
                         <p class="card-text"><strong>Роль:</strong> {{ user.role }}</p>
                         <p class="card-text"><strong>Біо:</strong> {{ user.bio }}</p>
+                        <button id="hello-btn" class="btn btn-primary mt-3">Привітати</button>
+                        <div id="greeting" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title">Валідація email</h4>
+                        <form id="email-form">
+                            <div class="mb-3">
+                                <label for="email-input" class="form-label">Email:</label>
+                                <input type="email" class="form-control" id="email-input" placeholder="Введіть email">
+                            </div>
+                            <button type="submit" class="btn btn-success">Надіслати</button>
+                        </form>
+                        <div id="form-message" class="mt-3"></div>
                     </div>
                 </div>
             </div>
@@ -31,12 +51,3 @@
 </body>
 
 </html>
-{% if user.is_authenticated %}
-<div class="text-center mt-4">
-    <a href="/logout" class="btn btn-danger">Вийти</a>
-</div>
-{% else %}
-<div class="text-center mt-4">
-    <a href="/login" class="btn btn-primary">Увійти</a>
-</div>
-{% endif %}

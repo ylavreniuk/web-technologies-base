@@ -14,8 +14,16 @@ body {
     font-weight: bold;
 }
 
-.card-text {
-    color: #6c757d;
+.form-label {
+    color: #343a40;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
 }
 
 h1 {
@@ -26,10 +34,5 @@ h1 {
 @media (max-width: 576px) {
     h1 {
         font-size: 1.8rem;
-    }
-
-    .card-img-top {
-        width: 120px !important;
-        height: 120px !important;
     }
 }
